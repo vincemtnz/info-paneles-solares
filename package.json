@@ -1,0 +1,12 @@
+{
+  "name": "info-paneles-solares",
+  "version": "1.0.0",
+  "description": "Cálculo aproximado del output en Watts para paneles solares",
+  "scripts": {
+    "deploy": "surge"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "surge": "^0.23.1"
+  }
+}
