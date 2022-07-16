@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <title>Calculadora placas solares</title>
+    <style type="text/css">
+      body {
+        margin: 8px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+          sans-serif;
+      }
+      main {
+        max-width: 75ch;
+        margin: auto;
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+      }
+      main img {
+        width: 100%;
+        max-width: max-content;
+      }
+      #result-area {
+        background-color: beige;
+        margin-top: 2rem;
+        padding: 0.5rem 1rem;
+        max-width: fit-content;
+      }
+      #calc-table {
+        border-collapse: collapse;
+        border-spacing: 0 1rem;
+        width: max-content;
+      }
+      #calc-table tr {
+        border-bottom: 0.5rem solid transparent;
+      }
+      #calc-table th {
+        border-right: 1rem solid transparent;
+        text-align: left;
+        padding-right: 1rem 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="intro">
+        <h1>...</h1>
+        <p>
+          <a
+            href="https://www.sfe-solar.com/noticias/articulos/paneles-solares-rendimiento/"
+            >Una eficiencia de un panel solar</a
+          >
+          de
+          <span class="highlight">16–17&percnt; es algo est&aacute;ndar</span>,
+          no quiere decir que sea ni bueno ni malo, simplemente es algo
+          est&aacute;ndar. Pero lo que desde luego no es, es alta eficiencia.
+        </p>
+        <p>
+          La alta eficiencia, en paneles solares, se puede considerar
+          <span class="highlight">a partir de un 19&percnt;</span>.
+        </p>
+        <img
+          src="/assets/efficiency-graph.jpg"
+          alt="Solar cell efficiency and module output power by type"
+        />
+      </div>
+      <h2>Calculadora</h2>
+      <div class="input-section">
+        <table id="calc-table">
+          <tr>
+            <th>Ancho</th>
+            <td>
+              <input
+                id="input-width"
+                class="monospace-numeric"
+                type="number"
+                inputmode="numeric"
+                placeholder="0.00"
+                step="0.01"
+                min="0"
+              />
+            </td>
+          </tr>
+          <tr>
+            <th>Alto</th>
+            <td>
+              <input
+                id="input-height"
+                class="monospace-numeric"
+                type="number"
+                inputmode="numeric"
+                placeholder="0.00"
+                step="0.01"
+              />
+            </td>
+          </tr>
+          <tr>
+            <th>Eficiencia</th>
+            <td>
+              <input
+                id="input-efficiency"
+                class="monospace-numeric"
+                type="number"
+                min="0"
+                max="100"
+                value="19.00"
+                step="0.1"
+              />
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div id="result-area"></div>
+      <br />
+      <div class="instructions">
+        <h4>C&oacute;mo medir el ancho y alto de un panel solar</h4>
+        <p>
+          Para medir el ancho y alto de un panel solar, es importante tener en
+          cuenta solamente la superficie útil. Para ello, mediremos el panel sin
+          contar los márgenes y los bordes, ni el espacio entre módulos. Véase
+          la siguiente imágen:
+        </p>
+        <img src="/assets/medidas.jpg" alt="Calcular alto y ancho" />
+      </div>
+    </main>
+    <script type="text/javascript">
+      const MAX_WATTAGE_PER_SQMT = 1000;
+
+      function calculateWattage(areaInSqmt, panelEfficiency = 1) {
+        return areaInSqmt * panelEfficiency * MAX_WATTAGE_PER_SQMT;
+      }
+
+      function monospace(text) {
+        const $el = document.createElement("span", { class: "monospace" });
+        $el.innerText = text;
+        return $el;
+      }
+
+      function renderResult(efficiency, wattage) {
+        const $div = document.createElement("div");
+
+        let $p = document.createElement("p");
+        $p.innerHTML = `Con un ${efficiency}% de eficiencia, el panel dar&iacutea unos `;
+        $p.append(monospace(`${wattage}W`));
+        $div.append($p);
+
+        return $div;
+      }
+
+      function onInputChange() {
+        // Width and height values
+        const width = Number($width?.value) || 0;
+        const height = Number($height?.value) || 0;
+        const area = (width * height) / 10000;
+        const efficiency = Number($efficiency?.value) || 0;
+
+        const avgWattage = calculateWattage(area, efficiency / 100);
+
+        // Para separar decimales según el idioma del navegador
+        // utilizamos un Intl.NumberFormat:
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat
+        const formatter = Intl.NumberFormat(navigator.language, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 4,
+        });
+
+        $result.replaceChildren(
+          ($result.textContent = renderResult(
+            efficiency,
+            formatter.format(avgWattage)
+          ))
+        );
+      }
+
+      // DOM elements
+      const $width = document.getElementById("input-width");
+      const $height = document.getElementById("input-height");
+      const $efficiency = document.getElementById("input-efficiency");
+      const $result = document.getElementById("result-area");
+
+      // Event listeners
+      $width?.addEventListener("input", onInputChange);
+      $height?.addEventListener("input", onInputChange);
+      $efficiency?.addEventListener("input", onInputChange);
+
+      // Actualizar el resultado al cargar la pagina
+      document.addEventListener("DOMContentLoaded", onInputChange);
+    </script>
+  </body>
+</html>
